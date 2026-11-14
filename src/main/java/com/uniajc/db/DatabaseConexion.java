@@ -11,9 +11,10 @@ import java.util.Properties;
 import java.util.stream.Stream;
 
 public class DatabaseConexion {
+    // Reutiliza una conexión durante la ejecución; las credenciales se leen al abrirla.
     private static Connection connection;
 
-    /** Obtiene la conexión a PostgreSQL usando config.properties. */
+    /** Obtiene la conexión PostgreSQL configurada en el archivo local config.properties. */
     public static Connection getConnection() {
         if (connection != null) {
             return connection;
@@ -21,18 +22,25 @@ public class DatabaseConexion {
 
         Properties properties = new Properties();
         try {
+            // Carga la configuración local para no guardar secretos dentro del código fuente.
             loadProperties(properties);
 
-            String url = required(properties, "URL");
+            // Admite el formato JDBC y el formato postgresql:// de algunos proveedores.
+            String url = required(properties, "db.url", "URL");
             if (url.startsWith("postgresql://")) {
                 url = "jdbc:" + url;
             }
-            String user = properties.getProperty("USERNAME", properties.getProperty("USER"));
+            String user = firstProperty(properties, "db.user", "USERNAME", "USER");
             if (user == null || user.isBlank()) {
-                throw new IOException("Falta la propiedad USER (o USERNAME) en config.properties.");
+                throw new IOException("Falta la propiedad USER, USERNAME o db.user en config.properties.");
             }
 
-            connection = DriverManager.getConnection(url, user, required(properties, "PASSWORD"));
+            // Fuerza la sintaxis CALL de JDBC para que PostgreSQL invoque procedimientos, no funciones.
+            Properties connectionProperties = new Properties();
+            connectionProperties.setProperty("user", user);
+            connectionProperties.setProperty("password", required(properties, "db.password", "PASSWORD"));
+            connectionProperties.setProperty("escapeSyntaxCallMode", "callIfNoReturn");
+            connection = DriverManager.getConnection(url, connectionProperties);
             System.out.println("Conexión exitosa.");
             return connection;
         } catch (SQLException | IOException error) {
@@ -42,6 +50,7 @@ public class DatabaseConexion {
     }
 
     private static void loadProperties(Properties properties) throws IOException {
+        // Busca primero en el directorio de ejecución y luego en el classpath del proyecto.
         Path configPath = findConfigFile();
         if (configPath != null) {
             try (InputStream input = Files.newInputStream(configPath)) {
@@ -54,8 +63,8 @@ public class DatabaseConexion {
                 .getResourceAsStream("config.properties");
         if (resource == null) {
             throw new IOException("No se encontró config.properties en la carpeta actual, sus subcarpetas "
-                    + "de proyecto ni en el classpath. Créalo en la raíz del proyecto con URL, USERNAME "
-                    + "(o USER) y PASSWORD.");
+                    + "de proyecto ni en el classpath. Créalo con db.url, db.user y db.password, o con "
+                    + "URL, USERNAME (o USER) y PASSWORD.");
         }
         try (resource) {
             properties.load(resource);
@@ -63,6 +72,7 @@ public class DatabaseConexion {
     }
 
     private static Path findConfigFile() throws IOException {
+        // También permite ejecutar desde la carpeta que contiene el proyecto.
         Path current = Path.of("").toAbsolutePath().normalize();
         Path direct = current.resolve("config.properties");
         if (Files.isRegularFile(direct)) {
@@ -77,12 +87,24 @@ public class DatabaseConexion {
         }
     }
 
-    private static String required(Properties properties, String key) throws IOException {
-        String value = properties.getProperty(key);
+    private static String required(Properties properties, String... keys) throws IOException {
+        // Comprueba que la propiedad exista sin imprimir su valor sensible.
+        String value = firstProperty(properties, keys);
         if (value == null || value.isBlank()) {
-            throw new IOException("Falta la propiedad " + key + " en config.properties.");
+            throw new IOException("Falta la propiedad " + String.join(" o ", keys) + " en config.properties.");
         }
         return value;
+    }
+
+    private static String firstProperty(Properties properties, String... keys) {
+        // Usa el primer alias configurado, por ejemplo db.user o USERNAME.
+        for (String key : keys) {
+            String value = properties.getProperty(key);
+            if (value != null && !value.isBlank()) {
+                return value;
+            }
+        }
+        return null;
     }
 
     /** Cierra la conexión si está abierta. */

@@ -56,7 +56,15 @@ classDiagram
 6.  **Pruebas:** Asegúrate de que tu código pase los tests de validación del docente.
 
 ## Configuración de BD:
-Usa el archivo `config.properties` en la raíz para configurar tu conexión a MySQL, Postgres (Neon) o SQLite local.
+Usa `config.properties` en la raíz del proyecto. La conexión acepta `db.url`, `db.user` y `db.password`,
+o sus alias `URL`, `USERNAME` y `PASSWORD`. El archivo está ignorado por Git; conserva allí las
+credenciales y reinicia la aplicación después de cambiarlas. No subas ese archivo al repositorio.
+
+La base configurada debe tener la tabla `public.estudiante` con `id`, `name`, `lastname`, `email`, `nit`
+y `numcelular`. Ejecuta [`src/main/resources/db/estudiantes.sql`](src/main/resources/db/estudiantes.sql) para instalar
+las rutinas usadas por el CRUD: `sp_insertar_estudiante` (crear), `fn_listar_estudiantes` (listar),
+`sp_actualizar_estudiante` (editar) y `sp_eliminar_estudiante` (eliminar). Luego inicia la aplicación desde
+tu IDE usando `com.uniajc.Main`.
 
 ---
 *Recuerda: El Modelo nunca debe hablar con el usuario (sin System.out). El Controlador orquesta y la Vista interactúa.*
