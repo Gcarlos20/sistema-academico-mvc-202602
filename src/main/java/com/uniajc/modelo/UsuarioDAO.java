@@ -31,5 +31,15 @@ public class UsuarioDAO {
         }
     }
 
-    
+    public boolean actualizarHashContrasena(long id, String hash) {
+        String sql = "UPDATE public.username SET password = ? WHERE id = ?";
+        Connection connection = DatabaseConexion.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, hash);
+            statement.setLong(2, id);
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException("No se pudo actualizar el hash de la contraseña: " + e.getMessage(), e);
+        }
+    }
 }
