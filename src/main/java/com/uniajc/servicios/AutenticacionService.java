@@ -9,16 +9,16 @@ import java.util.Optional;
 public class AutenticacionService {
     private final UsuarioDAO dao;
     private final PasswordHasher passwordHasher;
-
+// Constructor que recibe un DAO de usuarios y un hasher de contraseñas.
     public AutenticacionService() {
         this(new UsuarioDAO(), new PasswordHasher());
     }
-
+// Constructor que recibe un DAO de usuarios y un hasher de contraseñas.
     public AutenticacionService(UsuarioDAO dao, PasswordHasher passwordHasher) {
         this.dao = dao;
         this.passwordHasher = passwordHasher;
     }
-
+// Autentica un usuario por su nombre de usuario y contraseña, devolviendo el usuario sin el hash si es válido.
     public Optional<Usuario> autenticar(String username, char[] contrasena) {
         if (username == null || username.isBlank() || contrasena == null || contrasena.length == 0) {
             return Optional.empty();

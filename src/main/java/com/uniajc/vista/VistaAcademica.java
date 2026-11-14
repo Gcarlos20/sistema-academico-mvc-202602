@@ -14,8 +14,12 @@ import com.uniajc.modelo.Inscripcion;
 import com.uniajc.modelo.Materia;
 import com.uniajc.modelo.Usuario;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.GridLayout;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -25,6 +29,11 @@ import javax.swing.JTextField;
 
 /** Ventana principal con un módulo CRUD para cada entidad académica. */
 public class VistaAcademica {
+    private static final Color FONDO = new Color(245, 247, 250);
+    private static final Color MARINO = new Color(20, 35, 58);
+    private static final Color TEXTO = new Color(35, 48, 65);
+    private static final Color GRIS = new Color(103, 116, 132);
+
     private final JFrame ventana = new JFrame("UNIAJC | Sistema académico");
     private final ControladorEstudiante estudiantes = new ControladorEstudiante();
     private final ControladorDocente docentes = new ControladorDocente();
@@ -36,14 +45,44 @@ public class VistaAcademica {
     public VistaAcademica(Usuario usuario) {
         ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ventana.setSize(1100, 650);
+        ventana.setMinimumSize(new java.awt.Dimension(900, 580));
         ventana.setLocationRelativeTo(null);
+        ventana.getContentPane().setBackground(FONDO);
 
         JPanel encabezado = new JPanel(new BorderLayout());
-        encabezado.add(new JLabel("Sistema académico  |  " + usuario.nombre()
-                + (usuario.rol() == null ? "" : "  (" + usuario.rol() + ")")), BorderLayout.WEST);
-        encabezado.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 16, 12, 16));
+        encabezado.setBackground(MARINO);
+        encabezado.setBorder(BorderFactory.createEmptyBorder(13, 22, 13, 22));
+
+        JPanel marca = new JPanel(new GridLayout(2, 1, 0, 3));
+        marca.setOpaque(false);
+        JLabel nombreMarca = new JLabel("UNIAJC  |  SISTEMA ACADÉMICO");
+        nombreMarca.setFont(new Font("SansSerif", Font.BOLD, 16));
+        nombreMarca.setForeground(Color.WHITE);
+        JLabel detalleMarca = new JLabel("GESTIÓN ACADÉMICA");
+        detalleMarca.setFont(new Font("SansSerif", Font.PLAIN, 10));
+        detalleMarca.setForeground(new Color(190, 204, 221));
+        marca.add(nombreMarca);
+        marca.add(detalleMarca);
+        encabezado.add(marca, BorderLayout.WEST);
+
+        JPanel sesion = new JPanel(new GridLayout(2, 1, 0, 3));
+        sesion.setOpaque(false);
+        JLabel nombreUsuario = new JLabel(usuario.nombre());
+        nombreUsuario.setFont(new Font("SansSerif", Font.BOLD, 13));
+        nombreUsuario.setForeground(Color.WHITE);
+        nombreUsuario.setHorizontalAlignment(JLabel.RIGHT);
+        JLabel rolUsuario = new JLabel(usuario.rol() == null ? "Sesión activa" : usuario.rol());
+        rolUsuario.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        rolUsuario.setForeground(new Color(190, 204, 221));
+        rolUsuario.setHorizontalAlignment(JLabel.RIGHT);
+        sesion.add(nombreUsuario);
+        sesion.add(rolUsuario);
+        encabezado.add(sesion, BorderLayout.EAST);
 
         JTabbedPane modulos = new JTabbedPane();
+        modulos.setFont(new Font("SansSerif", Font.BOLD, 13));
+        modulos.setBackground(Color.WHITE);
+        modulos.addTab("Inicio", panelInicio(modulos, usuario));
         modulos.addTab("Estudiantes", panelEstudiantes());
         modulos.addTab("Docentes", panelDocentes());
         modulos.addTab("Materias", panelMaterias());
@@ -54,8 +93,83 @@ public class VistaAcademica {
         ventana.add(encabezado, BorderLayout.NORTH);
         ventana.add(modulos, BorderLayout.CENTER);
     }
-
+// Muestra la ventana principal.
     public void mostrar() { ventana.setVisible(true); }
+
+    private JPanel panelInicio(JTabbedPane modulos, Usuario usuario) {
+        JPanel inicio = new JPanel(new BorderLayout(0, 20));
+        inicio.setBackground(FONDO);
+        inicio.setBorder(BorderFactory.createEmptyBorder(24, 26, 26, 26));
+// Muestra un mensaje de bienvenida y una descripción de los módulos disponibles.
+        JPanel bienvenida = new JPanel(new GridLayout(2, 1, 0, 6));
+        bienvenida.setOpaque(false);
+        JLabel titulo = new JLabel("Bienvenido/a, " + usuario.nombre());
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 25));
+        titulo.setForeground(TEXTO);
+        JLabel descripcion = new JLabel("Selecciona un módulo para consultar y administrar la información académica.");
+        descripcion.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        descripcion.setForeground(GRIS);
+        bienvenida.add(titulo);
+        bienvenida.add(descripcion);
+        inicio.add(bienvenida, BorderLayout.NORTH);
+
+        JPanel tarjetas = new JPanel(new GridLayout(2, 3, 14, 14));
+        tarjetas.setOpaque(false);
+        tarjetas.add(tarjetaModulo(modulos, "Estudiantes", "Consulta los datos y registros de estudiantes.",
+                new Color(48, 112, 190)));
+        tarjetas.add(tarjetaModulo(modulos, "Docentes", "Administra docentes, especialidades y áreas.",
+                new Color(18, 139, 128)));
+        tarjetas.add(tarjetaModulo(modulos, "Materias", "Organiza materias y créditos académicos.",
+                new Color(132, 93, 184)));
+        tarjetas.add(tarjetaModulo(modulos, "Cursos", "Consulta las facultades y cursos registrados.",
+                new Color(211, 135, 49)));
+        tarjetas.add(tarjetaModulo(modulos, "Grupos", "Gestiona grupos, aulas y horarios.",
+                new Color(45, 136, 91)));
+        tarjetas.add(tarjetaModulo(modulos, "Inscripciones", "Revisa inscripciones, notas y estados.",
+                new Color(191, 83, 91)));
+        inicio.add(tarjetas, BorderLayout.CENTER);
+        return inicio;
+    }
+// Crea una tarjeta de módulo con un botón para abrirlo en la pestaña correspondiente.
+    private JPanel tarjetaModulo(JTabbedPane modulos, String nombre, String descripcion, Color acento) {
+        JPanel tarjeta = new JPanel(new BorderLayout(12, 0));
+        tarjeta.setBackground(Color.WHITE);
+        tarjeta.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(226, 231, 238)),
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)));
+
+        JPanel franja = new JPanel();
+        franja.setBackground(acento);
+        tarjeta.add(franja, BorderLayout.WEST);
+
+        JPanel contenido = new JPanel(new BorderLayout(0, 10));
+        contenido.setOpaque(false);
+        JPanel textos = new JPanel(new GridLayout(2, 1, 0, 6));
+        textos.setOpaque(false);
+        JLabel titulo = new JLabel(nombre);
+        titulo.setFont(new Font("SansSerif", Font.BOLD, 17));
+        titulo.setForeground(TEXTO);
+        JLabel detalle = new JLabel("<html><body style='width: 190px'>"
+                + descripcion + "</body></html>");
+        detalle.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        detalle.setForeground(GRIS);
+        textos.add(titulo);
+        textos.add(detalle);
+
+        JButton abrir = new JButton("Abrir módulo");
+        abrir.setFont(new Font("SansSerif", Font.BOLD, 12));
+        abrir.setForeground(Color.WHITE);
+        abrir.setBackground(acento);
+        abrir.setOpaque(true);
+        abrir.setFocusPainted(false);
+        abrir.setBorder(BorderFactory.createEmptyBorder(9, 12, 9, 12));
+        abrir.addActionListener(event -> modulos.setSelectedIndex(modulos.indexOfTab(nombre)));
+
+        contenido.add(textos, BorderLayout.CENTER);
+        contenido.add(abrir, BorderLayout.SOUTH);
+        tarjeta.add(contenido, BorderLayout.CENTER);
+        return tarjeta;
+    }
 
     private CrudTablePanel<Estudiante> panelEstudiantes() {
         return new CrudTablePanel<>(new String[] { "ID", "Nombre", "Apellido", "Correo", "NIT", "Celular" },
