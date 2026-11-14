@@ -12,7 +12,7 @@ import com.uniajc.db.DatabaseConexion;
 public class InscripcionDAO {
 
     public boolean insertar(Inscripcion ins) {
-        String sql = "INSERT INTO inscripcion (id_estiante, id_grupo, nota_final, estado) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO public.inscripcion (id_estiante, id_grupo, nota_final, estado) VALUES (?, ?, ?, ?)";
         Connection conn = DatabaseConexion.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, ins.getIdEstudiante());
@@ -27,7 +27,8 @@ public class InscripcionDAO {
 
     public List<Inscripcion> listarTodos() {
         List<Inscripcion> lista = new ArrayList<>();
-        String sql = "SELECT id_inscripcion, id_estiante, id_grupo, nota_final, estado FROM inscripcion ORDER BY id_inscripcion";
+        String sql = "SELECT id_inscripcion, id_estiante, id_grupo, nota_final, estado "
+                + "FROM public.inscripcion ORDER BY id_inscripcion";
         Connection conn = DatabaseConexion.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -46,13 +47,16 @@ public class InscripcionDAO {
         return lista;
     }
 
-    public boolean actualizarNotaYEstado(int idInscripcion, double notaFinal, String estado) {
-        String sql = "UPDATE inscripcion SET nota_final = ?, estado = ? WHERE id_inscripcion = ?";
+    public boolean actualizar(Inscripcion inscripcion) {
+        String sql = "UPDATE public.inscripcion SET id_estiante = ?, id_grupo = ?, nota_final = ?, estado = ? "
+                + "WHERE id_inscripcion = ?";
         Connection conn = DatabaseConexion.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setDouble(1, notaFinal);
-            ps.setString(2, estado);
-            ps.setInt(3, idInscripcion);
+            ps.setInt(1, inscripcion.getIdEstudiante());
+            ps.setInt(2, inscripcion.getIdGrupo());
+            ps.setDouble(3, inscripcion.getNotaFinal());
+            ps.setString(4, inscripcion.getEstado());
+            ps.setInt(5, inscripcion.getIdInscripcion());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException("Error al actualizar inscripción: " + e.getMessage(), e);
@@ -60,7 +64,7 @@ public class InscripcionDAO {
     }
 
     public boolean eliminar(int idInscripcion) {
-        String sql = "DELETE FROM inscripcion WHERE id_inscripcion = ?";
+        String sql = "DELETE FROM public.inscripcion WHERE id_inscripcion = ?";
         Connection conn = DatabaseConexion.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idInscripcion);

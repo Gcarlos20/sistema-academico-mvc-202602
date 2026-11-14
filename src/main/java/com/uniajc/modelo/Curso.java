@@ -1,7 +1,7 @@
 package com.uniajc.modelo;
 
 public class Curso {
-    private int id;
+    private long id;
     private String facultad;
 
     public Curso() {}
@@ -10,13 +10,13 @@ public class Curso {
         this.facultad = facultad;
     }
 
-    public Curso(int id, String facultad) {
+    public Curso(long id, String facultad) {
         this.id = id;
         this.facultad = facultad;
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public long getId() { return id; }
+    public void setId(long id) { this.id = id; }
 
     public String getFacultad() { return facultad; }
     public void setFacultad(String facultad) { this.facultad = facultad; }

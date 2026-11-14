@@ -1,22 +1,22 @@
 package com.uniajc.modelo;
 
 public class Grupo {
-    private int idGrupo;
-    private int idMateria;
-    private int idDocente;
+    private long idGrupo;
+    private long idMateria;
+    private long idDocente;
     private String aula;
     private String horario;
 
     public Grupo() {}
 
-    public Grupo(int idMateria, int idDocente, String aula, String horario) {
+    public Grupo(long idMateria, long idDocente, String aula, String horario) {
         this.idMateria = idMateria;
         this.idDocente = idDocente;
         this.aula = aula;
         this.horario = horario;
     }
 
-    public Grupo(int idGrupo, int idMateria, int idDocente, String aula, String horario) {
+    public Grupo(long idGrupo, long idMateria, long idDocente, String aula, String horario) {
         this.idGrupo = idGrupo;
         this.idMateria = idMateria;
         this.idDocente = idDocente;
@@ -24,14 +24,14 @@ public class Grupo {
         this.horario = horario;
     }
 
-    public int getIdGrupo() { return idGrupo; }
-    public void setIdGrupo(int idGrupo) { this.idGrupo = idGrupo; }
+    public long getIdGrupo() { return idGrupo; }
+    public void setIdGrupo(long idGrupo) { this.idGrupo = idGrupo; }
 
-    public int getIdMateria() { return idMateria; }
-    public void setIdMateria(int idMateria) { this.idMateria = idMateria; }
+    public long getIdMateria() { return idMateria; }
+    public void setIdMateria(long idMateria) { this.idMateria = idMateria; }
 
-    public int getIdDocente() { return idDocente; }
-    public void setIdDocente(int idDocente) { this.idDocente = idDocente; }
+    public long getIdDocente() { return idDocente; }
+    public void setIdDocente(long idDocente) { this.idDocente = idDocente; }
 
     public String getAula() { return aula; }
     public void setAula(String aula) { this.aula = aula; }

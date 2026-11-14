@@ -12,7 +12,7 @@ import com.uniajc.db.DatabaseConexion;
 public class DocenteDAO {
 
     public boolean insertar(Docente doc) {
-        String sql = "INSERT INTO docente (nombre, especialidad, area) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO public.docente (nombre, especialidad, area) VALUES (?, ?, ?)";
         Connection conn = DatabaseConexion.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, doc.getNombre());
@@ -26,13 +26,13 @@ public class DocenteDAO {
 
     public List<Docente> listarTodos() {
         List<Docente> lista = new ArrayList<>();
-        String sql = "SELECT id_docente, nombre, especialidad, area FROM docente ORDER BY id_docente";
+        String sql = "SELECT id_docente, nombre, especialidad, area FROM public.docente ORDER BY id_docente";
         Connection conn = DatabaseConexion.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 lista.add(new Docente(
-                    rs.getInt("id_docente"),
+                    rs.getLong("id_docente"),
                     rs.getString("nombre"),
                     rs.getString("especialidad"),
                     rs.getString("area")
@@ -45,24 +45,24 @@ public class DocenteDAO {
     }
 
     public boolean actualizar(Docente doc) {
-        String sql = "UPDATE docente SET nombre = ?, especialidad = ?, area = ? WHERE id_docente = ?";
+        String sql = "UPDATE public.docente SET nombre = ?, especialidad = ?, area = ? WHERE id_docente = ?";
         Connection conn = DatabaseConexion.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, doc.getNombre());
             ps.setString(2, doc.getEspecialidad());
             ps.setString(3, doc.getArea());
-            ps.setInt(4, doc.getIdDocente());
+            ps.setLong(4, doc.getIdDocente());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException("Error al actualizar docente: " + e.getMessage(), e);
         }
     }
 
-    public boolean eliminar(int idDocente) {
-        String sql = "DELETE FROM docente WHERE id_docente = ?";
+    public boolean eliminar(long idDocente) {
+        String sql = "DELETE FROM public.docente WHERE id_docente = ?";
         Connection conn = DatabaseConexion.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, idDocente);
+            ps.setLong(1, idDocente);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException("Error al eliminar docente: " + e.getMessage(), e);

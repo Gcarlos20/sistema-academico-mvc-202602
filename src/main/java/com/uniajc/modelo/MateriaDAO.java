@@ -12,7 +12,7 @@ import com.uniajc.db.DatabaseConexion;
 public class MateriaDAO {
 
     public boolean insertar(Materia mat) {
-        String sql = "INSERT INTO materias (id_materia, nombre_materia, creditos) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO public.materias (id_materia, nombre_materia, creditos) VALUES (?, ?, ?)";
         Connection conn = DatabaseConexion.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, mat.getIdMateria());
@@ -26,7 +26,7 @@ public class MateriaDAO {
 
     public List<Materia> listarTodos() {
         List<Materia> lista = new ArrayList<>();
-        String sql = "SELECT id_materia, nombre_materia, creditos FROM materias ORDER BY id_materia";
+        String sql = "SELECT id_materia, nombre_materia, creditos FROM public.materias ORDER BY id_materia";
         Connection conn = DatabaseConexion.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -43,8 +43,22 @@ public class MateriaDAO {
         return lista;
     }
 
+    // Actualiza los datos descriptivos sin cambiar el identificador de la materia.
+    public boolean actualizar(Materia materia) {
+        String sql = "UPDATE public.materias SET nombre_materia = ?, creditos = ? WHERE id_materia = ?";
+        Connection conn = DatabaseConexion.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, materia.getNombreMateria());
+            ps.setInt(2, materia.getCreditos());
+            ps.setInt(3, materia.getIdMateria());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al actualizar materia: " + e.getMessage(), e);
+        }
+    }
+
     public boolean eliminar(int idMateria) {
-        String sql = "DELETE FROM materias WHERE id_materia = ?";
+        String sql = "DELETE FROM public.materias WHERE id_materia = ?";
         Connection conn = DatabaseConexion.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idMateria);

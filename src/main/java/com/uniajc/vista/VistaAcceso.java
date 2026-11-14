@@ -1,5 +1,7 @@
 package com.uniajc.vista;
 
+import com.uniajc.controlador.ControladorAcceso;
+import com.uniajc.modelo.Usuario;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -8,6 +10,8 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.Arrays;
+import java.util.Optional;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -28,6 +32,7 @@ public class VistaAcceso {
     private final JFrame ventana = new JFrame("UNIAJC | Sistema académico");
     private final JTextField usuario = new JTextField();
     private final JPasswordField contrasena = new JPasswordField();
+    private final ControladorAcceso controlador = new ControladorAcceso();
 
     public VistaAcceso() {
         ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -140,8 +145,8 @@ public class VistaAcceso {
         c.insets = new Insets(0, 0, 18, 0);
         panel.add(entrar, c);
 
-        JLabel aviso = texto("<html><center>Acceso de demostración: la autenticación<br>"
-                        + "aún no está conectada a usuarios reales.</center></html>",
+        JLabel aviso = texto("<html><center>Ingresa con una cuenta registrada<br>"
+                        + "en el sistema académico.</center></html>",
                 11, Font.PLAIN, GRIS);
         aviso.setHorizontalAlignment(SwingConstants.CENTER);
         c.gridy++;
@@ -151,22 +156,33 @@ public class VistaAcceso {
     }
 
     private void iniciarSesion() {
-        if (usuario.getText().isBlank() || contrasena.getPassword().length == 0) {
+        char[] clave = contrasena.getPassword();
+        if (usuario.getText().isBlank() || clave.length == 0) {
             JOptionPane.showMessageDialog(ventana, "Escribe tu usuario y contraseña para continuar.",
                     "Datos requeridos", JOptionPane.INFORMATION_MESSAGE);
+            Arrays.fill(clave, '\0');
+            contrasena.setText("");
             return;
         }
 
-        ventana.setVisible(false);
         try {
-            VistaEstudiante vista = new VistaEstudiante();
+            Optional<Usuario> autenticado = controlador.autenticar(usuario.getText(), clave);
+            if (autenticado.isEmpty()) {
+                JOptionPane.showMessageDialog(ventana, "Usuario o contraseña incorrectos, o cuenta inactiva.",
+                        "No se pudo iniciar sesión", JOptionPane.WARNING_MESSAGE);
+                contrasena.setText("");
+                return;
+            }
+            VistaAcademica vista = new VistaAcademica(autenticado.get());
             vista.mostrar();
             ventana.dispose();
         } catch (RuntimeException error) {
-            ventana.setVisible(true);
             JOptionPane.showMessageDialog(ventana,
                     "No se pudo abrir el sistema académico: " + error.getMessage(),
                     "Error de conexión", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            Arrays.fill(clave, '\0');
+            contrasena.setText("");
         }
     }
 
