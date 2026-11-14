@@ -1,11 +1,12 @@
 package com.uniajc.modelo;
 
-import com.uniajc.db.DatabaseConexion;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
+
+import com.uniajc.db.DatabaseConexion;
 
 /** Consulta cuentas y actualiza su hash sin devolver contraseñas a la vista. */
 public class UsuarioDAO {
