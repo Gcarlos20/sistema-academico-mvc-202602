@@ -78,7 +78,7 @@ public final class CrudTablePanel<T> extends JPanel {
             mostrarError(error);
         }
     }
-
+// Pide al usuario que cree un nuevo registro y lo guarda en la base de datos.
     private void crearRegistro() {
         try {
             T registro = mostrarFormulario.apply(null);
@@ -90,7 +90,7 @@ public final class CrudTablePanel<T> extends JPanel {
             mostrarError(error);
         }
     }
-
+// Pide al usuario que edite el registro seleccionado y lo actualiza en la base de datos.
     private void editarRegistro() {
         T seleccionado = seleccionado();
         if (seleccionado == null) return;
@@ -106,7 +106,7 @@ public final class CrudTablePanel<T> extends JPanel {
             mostrarError(error);
         }
     }
-
+// Pide confirmación y elimina el registro seleccionado.
     private void eliminarRegistro() {
         T seleccionado = seleccionado();
         if (seleccionado == null) return;
@@ -124,7 +124,7 @@ public final class CrudTablePanel<T> extends JPanel {
             mostrarError(error);
         }
     }
-
+// Devuelve el registro seleccionado en la tabla, o null si no hay ninguno.
     private T seleccionado() {
         int fila = tabla.getSelectedRow();
         if (fila < 0) {
@@ -133,7 +133,7 @@ public final class CrudTablePanel<T> extends JPanel {
         }
         return registros.get(fila);
     }
-
+// Muestra un mensaje de error en un cuadro de diálogo.
     private void mostrarError(RuntimeException error) {
         JOptionPane.showMessageDialog(this, error.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }

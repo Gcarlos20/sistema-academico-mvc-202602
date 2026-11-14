@@ -16,7 +16,6 @@ import com.uniajc.modelo.Usuario;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridLayout;
-import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -33,7 +32,7 @@ public class VistaAcademica {
     private final ControladorGrupo grupos = new ControladorGrupo();
     private final ControladorInscripcion inscripciones = new ControladorInscripcion();
     private final ControladorCurso cursos = new ControladorCurso();
-
+    // Constructor que inicializa la ventana y los módulos CRUD.
     public VistaAcademica(Usuario usuario) {
         ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ventana.setSize(1100, 650);
