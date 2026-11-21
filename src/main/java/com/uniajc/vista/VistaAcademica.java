@@ -172,7 +172,8 @@ public class VistaAcademica {
     }
 
     private CrudTablePanel<Estudiante> panelEstudiantes() {
-        return new CrudTablePanel<>(new String[] { "ID", "Nombre", "Apellido", "Correo", "NIT", "Celular" },
+        return new CrudTablePanel<>("Estudiantes", "Consulta y administra los datos de las personas registradas.",
+                new String[] { "ID", "Nombre", "Apellido", "Correo", "NIT", "Celular" },
                 estudiantes::listarEstudiantes,
                 e -> new Object[] { e.getId(), e.getName(), e.getLastname(), e.getEmail(), e.getNit(), e.getNumcelular() },
                 this::formularioEstudiante,
@@ -182,7 +183,8 @@ public class VistaAcademica {
     }
 
     private CrudTablePanel<Docente> panelDocentes() {
-        return new CrudTablePanel<>(new String[] { "ID", "Nombre", "Especialidad", "Área" },
+        return new CrudTablePanel<>("Docentes", "Organiza la información de docentes y sus áreas académicas.",
+                new String[] { "ID", "Nombre", "Especialidad", "Área" },
                 docentes::listar,
                 d -> new Object[] { d.getIdDocente(), d.getNombre(), d.getEspecialidad(), d.getArea() },
                 this::formularioDocente, docentes::crear, docentes::actualizar,
@@ -190,7 +192,8 @@ public class VistaAcademica {
     }
 
     private CrudTablePanel<Materia> panelMaterias() {
-        return new CrudTablePanel<>(new String[] { "ID", "Materia", "Créditos" },
+        return new CrudTablePanel<>("Materias", "Administra asignaturas y créditos del programa.",
+                new String[] { "ID", "Materia", "Créditos" },
                 materias::listar,
                 m -> new Object[] { m.getIdMateria(), m.getNombreMateria(), m.getCreditos() },
                 this::formularioMateria, materias::crear, materias::actualizar,
@@ -198,13 +201,15 @@ public class VistaAcademica {
     }
 
     private CrudTablePanel<Curso> panelCursos() {
-        return new CrudTablePanel<>(new String[] { "ID", "Facultad" }, cursos::listar,
+        return new CrudTablePanel<>("Cursos", "Consulta y administra las facultades y cursos registrados.",
+                new String[] { "ID", "Facultad" }, cursos::listar,
                 c -> new Object[] { c.getId(), c.getFacultad() }, this::formularioCurso,
                 cursos::crear, cursos::actualizar, c -> cursos.eliminar(c.getId()));
     }
 
     private CrudTablePanel<Grupo> panelGrupos() {
-        return new CrudTablePanel<>(new String[] { "ID", "ID curso", "ID docente", "Aula", "Horario" },
+        return new CrudTablePanel<>("Grupos", "Gestiona grupos, aulas y horarios de clase.",
+                new String[] { "ID", "ID curso", "ID docente", "Aula", "Horario" },
                 grupos::listar,
                 g -> new Object[] { g.getIdGrupo(), g.getIdMateria(), g.getIdDocente(), g.getAula(), g.getHorario() },
                 this::formularioGrupo, grupos::crear, grupos::actualizar,
@@ -212,7 +217,8 @@ public class VistaAcademica {
     }
 
     private CrudTablePanel<Inscripcion> panelInscripciones() {
-        return new CrudTablePanel<>(new String[] { "ID", "ID estudiante", "ID grupo", "Nota final", "Estado" },
+        return new CrudTablePanel<>("Inscripciones", "Revisa estudiantes inscritos, notas y estados.",
+                new String[] { "ID", "ID estudiante", "ID grupo", "Nota final", "Estado" },
                 inscripciones::listar,
                 i -> new Object[] { i.getIdInscripcion(), i.getIdEstudiante(), i.getIdGrupo(), i.getNotaFinal(), i.getEstado() },
                 this::formularioInscripcion, inscripciones::crear, inscripciones::actualizar,
