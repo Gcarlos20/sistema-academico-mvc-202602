@@ -74,7 +74,9 @@ flowchart LR
 
 La ventana `VistaAcademica` muestra pestañas con CRUD para estudiantes, docentes, materias, cursos,
 grupos e inscripciones. Cada entidad tiene su modelo, DAO, servicio y controlador; los paneles Swing
-comparten `CrudTablePanel` para listar, crear, editar y eliminar.
+comparten `CrudTablePanel` para listar, crear, editar y eliminar. Los módulos incluyen búsqueda
+instantánea sobre todas sus columnas: no distingue mayúsculas ni tildes y admite las primeras letras
+de una o varias palabras.
 
 El acceso consulta `public.username`. `UsuarioDAO` obtiene la cuenta, `AutenticacionService` verifica
 la contraseña y `ControladorAcceso` conecta el servicio con `VistaAcceso`. El hash nunca se muestra en la

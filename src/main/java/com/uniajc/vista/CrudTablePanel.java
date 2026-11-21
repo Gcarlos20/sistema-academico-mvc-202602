@@ -8,9 +8,11 @@ import java.awt.Font;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.text.Normalizer;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -19,8 +21,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
@@ -37,9 +42,11 @@ public final class CrudTablePanel<T> extends JPanel {
     private final Predicate<T> actualizar;
     private final Predicate<T> eliminar;
     private final List<T> registros = new ArrayList<>();
+    private final List<T> registrosVisibles = new ArrayList<>();
     private final DefaultTableModel modelo;
     private final JTable tabla;
     private final JLabel contador;
+    private final JTextField busqueda;
 
     public CrudTablePanel(String titulo, String descripcion, String[] columnas,
                           Supplier<List<T>> listar,
@@ -104,6 +111,29 @@ public final class CrudTablePanel<T> extends JPanel {
         contador.setHorizontalAlignment(SwingConstants.CENTER);
         encabezado.add(textos, BorderLayout.CENTER);
         encabezado.add(contador, BorderLayout.EAST);
+
+        JPanel panelBusqueda = new JPanel(new BorderLayout(8, 0));
+        panelBusqueda.setOpaque(false);
+        panelBusqueda.setBorder(BorderFactory.createEmptyBorder(12, 0, 0, 0));
+        JLabel etiquetaBusqueda = new JLabel("Buscar:");
+        etiquetaBusqueda.setFont(new Font("SansSerif", Font.BOLD, 12));
+        etiquetaBusqueda.setForeground(GRIS);
+        busqueda = new JTextField();
+        busqueda.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        busqueda.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(205, 213, 223)),
+                BorderFactory.createEmptyBorder(8, 10, 8, 10)));
+        busqueda.getDocument().addDocumentListener(new DocumentListener() {
+            @Override public void insertUpdate(DocumentEvent event) { aplicarBusqueda(); }
+            @Override public void removeUpdate(DocumentEvent event) { aplicarBusqueda(); }
+            @Override public void changedUpdate(DocumentEvent event) { aplicarBusqueda(); }
+        });
+        JButton limpiar = boton("Limpiar", Color.WHITE, AZUL);
+        limpiar.addActionListener(event -> busqueda.setText(""));
+        panelBusqueda.add(etiquetaBusqueda, BorderLayout.WEST);
+        panelBusqueda.add(busqueda, BorderLayout.CENTER);
+        panelBusqueda.add(limpiar, BorderLayout.EAST);
+        encabezado.add(panelBusqueda, BorderLayout.SOUTH);
         add(encabezado, BorderLayout.NORTH);
 
         JScrollPane scroll = new JScrollPane(tabla);
@@ -168,12 +198,57 @@ public final class CrudTablePanel<T> extends JPanel {
         try {
             registros.clear();
             registros.addAll(listar.get());
-            modelo.setRowCount(0);
-            for (T registro : registros) modelo.addRow(convertirFila.apply(registro));
-            contador.setText(registros.size() + (registros.size() == 1 ? " registro" : " registros"));
+            aplicarBusqueda();
         } catch (RuntimeException error) {
             mostrarError(error);
         }
+    }
+
+    private void aplicarBusqueda() {
+        String criterio = busqueda.getText();
+        registrosVisibles.clear();
+        modelo.setRowCount(0);
+
+        for (T registro : registros) {
+            if (coincide(registro, criterio)) {
+                registrosVisibles.add(registro);
+                modelo.addRow(convertirFila.apply(registro));
+            }
+        }
+
+        int visibles = registrosVisibles.size();
+        if (normalizar(criterio).isBlank()) {
+            contador.setText(visibles + (visibles == 1 ? " registro" : " registros"));
+        } else {
+            contador.setText(visibles + " de " + registros.size());
+        }
+    }
+
+    private boolean coincide(T registro, String criterio) {
+        String consulta = normalizar(criterio);
+        if (consulta.isBlank()) return true;
+
+        Object[] fila = convertirFila.apply(registro);
+        StringBuilder textoFila = new StringBuilder();
+        for (Object valor : fila) {
+            if (valor != null) {
+                if (textoFila.length() > 0) textoFila.append(' ');
+                textoFila.append(valor);
+            }
+        }
+
+        String texto = normalizar(textoFila.toString());
+        for (String palabra : consulta.split("\\s+")) {
+            if (!texto.contains(palabra)) return false;
+        }
+        return true;
+    }
+
+    public static String normalizar(String texto) {
+        if (texto == null) return "";
+        String sinTildes = Normalizer.normalize(texto, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}+", "");
+        return sinTildes.toLowerCase(Locale.ROOT).trim().replaceAll("\\s+", " ");
     }
 // Pide al usuario que cree un nuevo registro y lo guarda en la base de datos.
     private void crearRegistro() {
@@ -228,7 +303,7 @@ public final class CrudTablePanel<T> extends JPanel {
             JOptionPane.showMessageDialog(this, "Selecciona una fila primero.");
             return null;
         }
-        return registros.get(fila);
+        return registrosVisibles.get(fila);
     }
 // Muestra un mensaje de error en un cuadro de diálogo.
     private void mostrarError(RuntimeException error) {
